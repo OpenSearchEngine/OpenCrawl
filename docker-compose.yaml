@@ -1,0 +1,30 @@
+version: '3'
+services:
+  api:
+    container_name: opencrawl-api
+    build:
+      context: ./
+      dockerfile: Dockerfile.api
+    volumes:
+      - ./:/code
+  puppeteer:
+    container_name: opencrawl-puppeteer
+    image: opensearchengine/puppeteer-api:latest
+  database:
+    container_name: opencrawl-database
+    image: mariadb
+    ports:
+      - 4002:3301
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: opencrawl
+  nginx:
+    container_name: opencrawl-nginx
+    image: nginx:latest
+    depends_on:
+      - api
+    volumes:
+      - ./:/code
+      - ./site.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 4001:80
